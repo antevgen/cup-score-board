@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Listener\ScoreBoard;
 
+use App\Domain\Collection\FootballMatchCollection;
 use App\Domain\Collection\MatchCollection;
 use App\Event\ScoreBoard\EventInterface;
 use App\Event\ScoreBoard\UpdateFootballScoreEvent;
-use App\Service\ScoreBoard\ScoreBoardInterface;
 
 class UpdateFootballScore implements BoardInterface
 {
@@ -17,8 +17,11 @@ class UpdateFootballScore implements BoardInterface
         return $event instanceof UpdateFootballScoreEvent;
     }
 
-    public function handle(EventInterface $event, MatchCollection $matches): void
+    /**
+     * @param UpdateFootballScoreEvent $event
+     */
+    public function handle(EventInterface $event, FootballMatchCollection|MatchCollection $matches): void
     {
-        // TODO: Implement handle() method.
+        $matches->get($event->homeTeam, $event->awayTeam)->updateScore($event->homeScore, $event->awayScore);
     }
 }

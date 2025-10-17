@@ -24,9 +24,10 @@ class FootballMatchCollection extends MatchCollection
     public function get(Team $homeTeam, Team $awayTeam): FootballMatch
     {
         $name = $this->getFootballMatchName($homeTeam, $awayTeam);
-        if ($this->has($name)) {
+        if (! $this->has($name)) {
             throw new OutOfBoundsException('A match between these teams do not exists.');
         }
+
         return $this->items[$name];
     }
 
