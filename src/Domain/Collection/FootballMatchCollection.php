@@ -34,7 +34,7 @@ class FootballMatchCollection extends MatchCollection
     public function remove(Team $homeTeam, Team $awayTeam): void
     {
         $name = $this->getFootballMatchName($homeTeam, $awayTeam);
-        if ($this->has($name)) {
+        if (! $this->has($name)) {
             throw new OutOfBoundsException('A match between these teams do not exists.');
         }
         unset($this->items[$name]);

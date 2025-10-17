@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\Domain\Team;
+use App\Event\ScoreBoard\FinishFootballGameEvent;
 use App\Event\ScoreBoard\StartFootballGameEvent;
 use App\Event\ScoreBoard\UpdateFootballScoreEvent;
-use App\Listener\ScoreBoard\BoardInterface;
 use App\Listener\ScoreBoard\FinishFootballGame;
 use App\Listener\ScoreBoard\StartFootballGame;
 use App\Listener\ScoreBoard\UpdateFootballScore;
@@ -14,10 +14,8 @@ use PHPUnit\Framework\TestCase;
 
 class CupScoreBoardTest extends TestCase
 {
-    /** @var array<BoardInterface> */
-    private array $listeners;
-
     private array $teams;
+    private CupScoreBoard $cupScoreBoard;
 
     protected function setUp(): void
     {
@@ -54,19 +52,18 @@ class CupScoreBoardTest extends TestCase
             ]
         ];
 
-        $this->listeners = [
+        $this->cupScoreBoard = new CupScoreBoard([
             new StartFootballGame(),
             new UpdateFootballScore(),
             new FinishFootballGame(),
-        ];
+        ]);
     }
 
     public function testStartFootballGames(): void
     {
-        $cupScoreBoard = new CupScoreBoard($this->listeners);
         foreach ($this->teams as $team) {
             $event = new StartFootballGameEvent($team['home'], $team['away']);
-            $cupScoreBoard->handle($event);
+            $this->cupScoreBoard->handle($event);
         }
 
         $expectedSummaryLines = array_map(
@@ -80,22 +77,21 @@ class CupScoreBoardTest extends TestCase
             array_reverse($this->teams),
         );
 
-        $summaryLines = $cupScoreBoard->summaryLines();
+        $summaryLines = $this->cupScoreBoard->summaryLines();
         $this->assertCount(count($this->teams), $summaryLines);
         $this->assertEquals($expectedSummaryLines, $summaryLines);
     }
 
     public function testUpdateScoreFootballGame(): void
     {
-        $cupScoreBoard = new CupScoreBoard($this->listeners);
         foreach ($this->teams as $team) {
             $startEvent = new StartFootballGameEvent($team['home'], $team['away']);
             $updateScoreEvent = new UpdateFootballScoreEvent($team['home'], $team['away'], $team['homeScore'], $team['awayScore']);
-            $cupScoreBoard->handle($startEvent);
-            $cupScoreBoard->handle($updateScoreEvent);
+            $this->cupScoreBoard->handle($startEvent);
+            $this->cupScoreBoard->handle($updateScoreEvent);
         }
 
-        $summaryLines = $cupScoreBoard->summaryLines();
+        $summaryLines = $this->cupScoreBoard->summaryLines();
         $this->assertCount(count($this->teams), $summaryLines);
         $this->assertEquals([
             'Uruguay 6 - Italy 6',
@@ -104,5 +100,49 @@ class CupScoreBoardTest extends TestCase
             'Argentina 3 - Australia 1',
             'Germany 2 - France 2',
         ], $summaryLines);
+    }
+
+    public function testFinishFootballGame(): void
+    {
+        foreach ($this->teams as $team) {
+            $startEvent = new StartFootballGameEvent($team['home'], $team['away']);
+            $updateScoreEvent = new UpdateFootballScoreEvent($team['home'], $team['away'], $team['homeScore'], $team['awayScore']);
+            $this->cupScoreBoard->handle($startEvent);
+            $this->cupScoreBoard->handle($updateScoreEvent);
+        }
+
+        $summaryLines = $this->cupScoreBoard->summaryLines();
+        $this->assertCount(count($this->teams), $summaryLines);
+        $this->assertEquals([
+            'Uruguay 6 - Italy 6',
+            'Spain 10 - Brazil 2',
+            'Mexico 0 - Canada 5',
+            'Argentina 3 - Australia 1',
+            'Germany 2 - France 2',
+        ], $summaryLines);
+
+
+        $finishEvent = new FinishFootballGameEvent($this->teams[0]['home'], $this->teams[0]['away']);
+        $this->cupScoreBoard->handle($finishEvent);
+        $summaryLines = $this->cupScoreBoard->summaryLines();
+        $this->assertCount(count($this->teams) - 1, $summaryLines);
+        $this->assertEquals([
+            'Uruguay 6 - Italy 6',
+            'Spain 10 - Brazil 2',
+            'Argentina 3 - Australia 1',
+            'Germany 2 - France 2',
+        ], $summaryLines);
+    }
+
+    public function testNegativeScoresAreRejected(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $homeTeam = new Team('Mexico');
+        $awayTeam = new Team('Canada');
+        $startEvent = new StartFootballGameEvent($homeTeam, $awayTeam);
+        $updateScoreEvent = new UpdateFootballScoreEvent($homeTeam, $awayTeam, -1, 0);
+        $this->cupScoreBoard->handle($startEvent);
+        $this->cupScoreBoard->handle($updateScoreEvent);
     }
 }
