@@ -20,5 +20,18 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Listener\ScoreBoard\StartFootballGame:
+      tags: [ 'app.scoreboard.listener' ]
+
+    App\Scoreboard\Listener\UpdateFootballScore:
+      tags: [ 'app.scoreboard.listener' ]
+
+    App\Scoreboard\Listener\FinishFootballGame:
+      tags: [ 'app.scoreboard.listener' ]
+
+    App\Service\ScoreBoard\CupScoreBoard:
+      arguments:
+        $listeners: !tagged_iterator app.scoreboard.listener
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
