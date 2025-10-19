@@ -64,7 +64,7 @@ class FootballMatch
 
     public function __toString(): string
     {
-        return sprintf(
+        return \sprintf(
             '%s %d - %s %d',
             $this->homeTeam->getName(),
             $this->homeScore,

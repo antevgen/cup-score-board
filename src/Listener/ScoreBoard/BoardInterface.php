@@ -10,5 +10,6 @@ use App\Event\ScoreBoard\EventInterface;
 interface BoardInterface
 {
     public function supports(EventInterface $event): bool;
+
     public function handle(EventInterface $event, MatchCollection $matches): void;
 }

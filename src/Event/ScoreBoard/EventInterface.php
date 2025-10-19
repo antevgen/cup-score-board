@@ -6,5 +6,4 @@ namespace App\Event\ScoreBoard;
 
 interface EventInterface
 {
-
 }

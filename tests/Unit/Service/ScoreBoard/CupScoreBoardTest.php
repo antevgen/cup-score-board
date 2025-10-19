@@ -49,7 +49,7 @@ class CupScoreBoardTest extends TestCase
                 'away' => new Team('Australia'),
                 'homeScore' => 3,
                 'awayScore' => 1,
-            ]
+            ],
         ];
 
         $this->cupScoreBoard = new CupScoreBoard([
@@ -67,7 +67,7 @@ class CupScoreBoardTest extends TestCase
         }
 
         $expectedSummaryLines = array_map(
-            static fn($team) => sprintf(
+            static fn ($team) => sprintf(
                 '%s %d - %s %d',
                 $team['home']->getName(),
                 0,
@@ -121,7 +121,6 @@ class CupScoreBoardTest extends TestCase
             'Germany 2 - France 2',
         ], $summaryLines);
 
-
         $finishEvent = new FinishFootballGameEvent($this->teams[0]['home'], $this->teams[0]['away']);
         $this->cupScoreBoard->handle($finishEvent);
         $summaryLines = $this->cupScoreBoard->summaryLines();
@@ -146,12 +145,11 @@ class CupScoreBoardTest extends TestCase
         $this->cupScoreBoard->handle($updateScoreEvent);
     }
 
-
     public function testTeamUsedForSeveralMatchesAtTheSameTimeFails(): void
     {
         $this->cupScoreBoard->handle(new StartFootballGameEvent(new Team('Uruguay'), new Team('France')));
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage("Team 'Uruguay' is already playing a match.");
 
         $this->cupScoreBoard->handle(new StartFootballGameEvent(new Team('Germany'), new Team('Uruguay')));

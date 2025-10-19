@@ -23,10 +23,10 @@ class FootballMatchCollection extends MatchCollection
         $activeTeams = $this->getActiveTeams();
 
         if (isset($activeTeams[$home->getName()])) {
-            throw new RuntimeException(sprintf("Team '%s' is already playing a match.", $home->getName()));
+            throw new RuntimeException(\sprintf("Team '%s' is already playing a match.", $home->getName()));
         }
         if (isset($activeTeams[$away->getName()])) {
-            throw new RuntimeException(sprintf("Team '%s' is already playing a match.", $away->getName()));
+            throw new RuntimeException(\sprintf("Team '%s' is already playing a match.", $away->getName()));
         }
 
         $this->items[$name] = $item;
@@ -35,7 +35,7 @@ class FootballMatchCollection extends MatchCollection
     public function get(Team $homeTeam, Team $awayTeam): FootballMatch
     {
         $name = $this->getFootballMatchName($homeTeam, $awayTeam);
-        if (! $this->has($name)) {
+        if (!$this->has($name)) {
             throw new OutOfBoundsException('A match between these teams do not exists.');
         }
 
@@ -45,7 +45,7 @@ class FootballMatchCollection extends MatchCollection
     public function remove(Team $homeTeam, Team $awayTeam): void
     {
         $name = $this->getFootballMatchName($homeTeam, $awayTeam);
-        if (! $this->has($name)) {
+        if (!$this->has($name)) {
             throw new OutOfBoundsException('A match between these teams do not exists.');
         }
         unset($this->items[$name]);
@@ -53,7 +53,7 @@ class FootballMatchCollection extends MatchCollection
 
     private function getFootballMatchName(Team $homeTeam, Team $awayTeam): string
     {
-        return sprintf('%s-%s', $homeTeam->getName(), $awayTeam->getName());
+        return \sprintf('%s-%s', $homeTeam->getName(), $awayTeam->getName());
     }
 
     private function getActiveTeams(): array

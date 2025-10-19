@@ -8,6 +8,7 @@ use App\Domain\Team;
 
 class StartFootballGameEvent implements EventInterface
 {
-    public function __construct(public Team $homeTeam, public Team $awayTeam) {
+    public function __construct(public Team $homeTeam, public Team $awayTeam)
+    {
     }
 }

@@ -32,7 +32,7 @@ class CupScoreBoard implements ScoreBoardInterface
         }
 
         if (!$handled) {
-            throw new InvalidArgumentException(sprintf('No listener for event: %s', $event::class));
+            throw new InvalidArgumentException(\sprintf('No listener for event: %s', $event::class));
         }
     }
 
@@ -55,7 +55,7 @@ class CupScoreBoard implements ScoreBoardInterface
     public function summaryLines(): array
     {
         return $this->summary()->map(
-            fn(FootballMatch $footballMatch) => (string) $footballMatch,
+            fn (FootballMatch $footballMatch) => (string) $footballMatch,
         )->values();
     }
 }

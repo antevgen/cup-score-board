@@ -11,7 +11,6 @@ use App\Event\ScoreBoard\FinishFootballGameEvent;
 
 class FinishFootballGame implements BoardInterface
 {
-
     public function supports(EventInterface $event): bool
     {
         return $event instanceof FinishFootballGameEvent;
