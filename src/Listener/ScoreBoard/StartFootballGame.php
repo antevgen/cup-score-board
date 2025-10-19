@@ -22,7 +22,6 @@ class StartFootballGame implements BoardInterface
      */
     public function handle(EventInterface $event, MatchCollection $matches): void
     {
-        $match = new FootballMatch($event->homeTeam, $event->awayTeam);
-        $matches->add($match);
+        $matches->add(new FootballMatch($event->homeTeam, $event->awayTeam));
     }
 }

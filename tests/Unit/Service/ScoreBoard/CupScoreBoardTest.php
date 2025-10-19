@@ -145,4 +145,32 @@ class CupScoreBoardTest extends TestCase
         $this->cupScoreBoard->handle($startEvent);
         $this->cupScoreBoard->handle($updateScoreEvent);
     }
+
+
+    public function testTeamUsedForSeveralMatchesAtTheSameTimeFails(): void
+    {
+        $this->cupScoreBoard->handle(new StartFootballGameEvent(new Team('Uruguay'), new Team('France')));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Team 'Uruguay' is already playing a match.");
+
+        $this->cupScoreBoard->handle(new StartFootballGameEvent(new Team('Germany'), new Team('Uruguay')));
+    }
+
+    public function testFinishingFreesTeamsSoTheyCanPlayAgain(): void
+    {
+        $home = new Team('Uruguay');
+        $away = new Team('France');
+
+        $this->cupScoreBoard->handle(new StartFootballGameEvent($home, $away));
+        $this->cupScoreBoard->handle(new FinishFootballGameEvent($home, $away));
+
+        $summaryLines = $this->cupScoreBoard->summaryLines();
+        $this->assertCount(0, $summaryLines);
+
+        $this->cupScoreBoard->handle(new StartFootballGameEvent($home, $away));
+
+        $summaryLines = $this->cupScoreBoard->summaryLines();
+        $this->assertCount(1, $summaryLines);
+    }
 }
